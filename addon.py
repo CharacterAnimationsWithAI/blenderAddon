@@ -1,13 +1,13 @@
 bl_info = {
-    "name": "New Object",
-    "author": "Your Name Here",
+    "name": "Animation Tool",
+    "author": "Abdullah Khan",
     "version": (1, 0),
     "blender": (2, 80, 0),
     "location": "View3D > Add > Mesh > New Object",
-    "description": "Adds a new Mesh Object",
+    "description": "",
     "warning": "",
     "doc_url": "",
-    "category": "Add Mesh",
+    "category": "",
 }
 
 import bpy
@@ -41,11 +41,11 @@ class WM_OT_textOp(bpy.types.Operator):
     
     def execute(self,context):
         save_path = str(pathlib.Path(__file__).parent.parent.resolve())+'/test.bvh'
-#        ixf self.target_frame != 0 and self.seed_frames != 0 and self.target_frame > self.seed_frames:
-        print(f"cwd:{save_path}")
-        print(f"seed frames: {self.seed_frames}")
-        print(f"target frame: {self.target_frame}")
-        bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, filter_glob='*.bvh', root_transform_only=False)
+        if self.target_frame != 0 and self.seed_frames != 0 and self.target_frame > self.seed_frames:
+            print(f"cwd:{save_path}")
+            print(f"seed frames: {self.seed_frames}")
+            print(f"target frame: {self.target_frame}")
+            bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, filter_glob='*.bvh', root_transform_only=False)
         
         
         return {'FINISHED'}
