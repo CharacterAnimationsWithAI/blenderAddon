@@ -10,7 +10,10 @@ bl_info = {
     "category": "",
 }
 
+import os
+import json
 import bpy
+import requests
 import pathlib
 
 class OBJECT_PT_AnimateTool(bpy.types.Panel):
@@ -36,17 +39,26 @@ class WM_OT_textOp(bpy.types.Operator):
     bl_label = "Animation Tool"
     bl_idname = "wm.textop"
     seed_frames : bpy.props.IntProperty(name= "Seed Frames:")
-    target_frame : bpy.props.IntProperty(name= "Target Frame")
+    target_frame : bpy.props.IntProperty(name= "Target Frame:")
     
     
     def execute(self,context):
-        save_path = str(pathlib.Path(__file__).parent.parent.resolve())+'/test.bvh'
+        save_path = os.path.join(str(pathlib.Path(__file__).parent.parent.resolve()), 'test.bvh')
+        
         if self.target_frame != 0 and self.seed_frames != 0 and self.target_frame > self.seed_frames:
             print(f"cwd:{save_path}")
             print(f"seed frames: {self.seed_frames}")
             print(f"target frame: {self.target_frame}")
             bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, filter_glob='*.bvh', root_transform_only=False)
-        
+            
+            print("Uploading to server...")
+            file = {'file': open(save_path, 'rb')}
+            response = requests.post('http://localhost:8000/upload', files=file)
+            filename = os.path.join("uploads", json.loads(response.text)["filename"])
+            response = requests.post('http://localhost:8000/motion-generation-model/inference', json.dumps({"filename": filename, "seed_frames": self.seed_frames}))
+            
+            print(response.text)
+                    
         
         return {'FINISHED'}
     
