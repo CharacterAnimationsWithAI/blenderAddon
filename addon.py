@@ -22,7 +22,7 @@ class OBJECT_PT_AnimateTool(bpy.types.Panel):
     bl_idname = "OBJECT_PT_AnimateTool"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Animation Tool"
+    bl_category = "nAnimation Tool"
 
     def draw(self, context):
         layout = self.layout
@@ -32,24 +32,28 @@ class OBJECT_PT_AnimateTool(bpy.types.Panel):
         row.operator("wm.textop")
 
 
-
-
-
 class WM_OT_textOp(bpy.types.Operator):
     bl_label = "Animation Tool"
     bl_idname = "wm.textop"
-    seed_frames : bpy.props.IntProperty(name= "Seed Frames:")
+    start_frame : bpy.props.IntProperty(name= "Start Frames:")
+    seed_frames : bpy.props.IntProperty(name= "# Seed Frames to use:")
     target_frame : bpy.props.IntProperty(name= "Target Frame:")
     
     
     def execute(self,context):
         save_path = os.path.join(str(pathlib.Path(__file__).parent.parent.resolve()), 'test.bvh')
-        
+    
+        # TODO: Check if seed, and target frames are valid with start frame    
         if self.target_frame != 0 and self.seed_frames != 0 and self.target_frame > self.seed_frames:
             print(f"cwd:{save_path}")
             print(f"seed frames: {self.seed_frames}")
             print(f"target frame: {self.target_frame}")
-            bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, filter_glob='*.bvh', root_transform_only=False)
+            bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, 
+                filter_glob='*.bvh', root_transform_only=True,
+                frame_start=self.start_frame,
+                frame_end=self.target_frame,
+                rotate_mode='YZX'
+                )
             
             print("Uploading to server...")
             file = {'file': open(save_path, 'rb')}
@@ -67,8 +71,6 @@ class WM_OT_textOp(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
 
 
-
-
 def register():
     bpy.utils.register_class(OBJECT_PT_AnimateTool)
     bpy.utils.register_class(WM_OT_textOp)
@@ -81,4 +83,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
