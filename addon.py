@@ -15,6 +15,7 @@ import json
 import bpy
 import requests
 import pathlib
+import math
 
 class OBJECT_PT_AnimateTool(bpy.types.Panel):
    
@@ -48,11 +49,14 @@ class WM_OT_textOp(bpy.types.Operator):
             print(f"cwd:{save_path}")
             print(f"seed frames: {self.seed_frames}")
             print(f"target frame: {self.target_frame}")
+            
+            bpy.context.active_object.rotation_euler[0] = math.radians(-90)
+            bpy.ops.object.transform_apply(rotation=True)
+            
             bpy.ops.export_anim.bvh(filepath=save_path, check_existing=True, 
                 filter_glob='*.bvh', root_transform_only=True,
                 frame_start=self.start_frame,
                 frame_end=self.target_frame,
-                rotate_mode='YZX'
                 )
             
             print("Uploading to server...")
