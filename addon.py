@@ -66,6 +66,7 @@ class WM_OT_textOp(bpy.types.Operator):
             response = requests.post('http://localhost:8000/motion-generation-model/inference', json.dumps({"filename": filename, "seed_frames": self.seed_frames}))
             
             print(json.loads(response.text))
+            bpy.ops.object.delete()
             bpy.ops.import_anim.bvh(filepath=json.loads(response.text)["url"])
                     
         
